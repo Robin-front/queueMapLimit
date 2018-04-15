@@ -33,12 +33,12 @@ const queue = new QueueMapLimit(5);
 queue
   .add(
     arr,
-    index =>
+    value =>
       new Promise((resolve, reject) => {
-        console.log("begin", index);
+        console.log("begin", value);
         setTimeout(() => {
-          console.log("end", index);
-          random(0, 10) > 9 ? reject(undefined) : resolve(index);
+          console.log("end", value);
+          random(0, 10) > 9 ? reject(undefined) : resolve(value);
         }, random(1, 50));
       })
   )
