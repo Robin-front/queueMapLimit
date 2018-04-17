@@ -8,7 +8,7 @@ const random = (start, end) =>
 let taskLength = 10;
 let taskIndex = 0;
 while (taskLength--) {
-  const arr = Array.from({ length: random(1, 10) }, () => taskIndex++);
+  const arr = Array.from({ length: random(0, 10) }, () => taskIndex++);
   queue
     .add(
       arr,

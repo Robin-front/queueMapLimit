@@ -16,6 +16,9 @@ class QueueMapLimit {
 
       (function refill() {
         if (completed >= length) {
+          if (length === 0){
+            self.task.shift();
+          }
           return resolve(results);
         }
 
