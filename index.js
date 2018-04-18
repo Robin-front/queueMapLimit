@@ -8,30 +8,30 @@ class QueueMapLimit {
     const self = this;
     const length = arr.length;
     const id = Symbol("#task");
-    self.task.push(id);
     return new Promise((resolve, reject) => {
       var completed = 0;
       var started = 0;
       var results = new Array(length);
 
+      if (length === 0) { return resolve(results); } // no task, resolve immediately
+
+      self.task.push(id); // push to queue list
+
       (function refill() {
-        if (completed >= length) {
-          if (length === 0){
-            self.task.shift();
-          }
+        if (completed >= length) { // when all completed, resolve.
           return resolve(results);
         }
 
-        if (id === self.task[0]) {
+        if (id === self.task[0]) { // if turn to this task, then begin
           while (self.running < self.concurrency && started < length) {
             self.running++;
             started++;
 
-            (function(index) {
+            (function (index) {
               var cur = arr[index];
               fn
                 .call(cur, cur, index, arr)
-                .then(function(result) {
+                .then(function (result) {
                   self.running--;
                   completed++;
                   results[index] = result;
@@ -40,19 +40,19 @@ class QueueMapLimit {
                 })
                 .catch(err => {
                   self.running--;
-                  completed++;
+                  completed++; // must be increase even err.
 
                   reject(err);
                 });
             })(started - 1);
           }
-          if (self.running >= self.concurrency && started < length) {
+          if (self.running >= self.concurrency && started < length) { // if up to concurrency limit, hold on
             setTimeout(refill, 0);
           }
-          if (started >= length) {
+          if (started >= length) { // async task all processing, it is time to turn to next task.
             self.task.shift();
           }
-        } else if (self.running >= self.concurrency || id !== self.task[0]) {
+        } else { // if doesnot turn to this task, then hold on
           setTimeout(refill, 0);
         }
       })();
